@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  tests:
+    uses: coolapso/tfimport/.github/workflows/test.yaml@main
+
+  release:
+    needs: tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ">=1.21"
+      - uses: go-semantic-release/action@v1
+        id: semrel
+        with:
+          allow-initial-development-versions: true
+          custom-arguments: "--commit-analyzer-opt patch_release_rules=fix,ref,build"
+          hooks: goreleaser
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AUR_KEY: ${{ secrets.AUR_KEY }}
+          DISCORD_WEBHOOK_ID: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          DISCORD_WEBHOOK_TOKEN: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}

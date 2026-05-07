@@ -1,0 +1,45 @@
+builds:
+  - binary: tfimport
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+      - "386"
+    ignore:
+      - goos: darwin
+        goarch: "386"
+      - goos: windows
+        goarch: arm64
+    main: .
+
+aurs:
+  - name: tfimport-bin
+    homepage: "https://tfimport.cooolapso.sh"
+    description: "The auto-pilot for tfimports"
+    maintainers:
+      - "coolapso <coolapso@coolapso.tech>"
+
+    license: "MIT"
+    private_key: "{{ .Env.AUR_KEY }}"
+    git_url: "ssh://aur@aur.archlinux.org/tfimport-bin.git"
+    skip_upload: auto
+nfpms:
+  - homepage: "https://tfimport.cooolapso.sh"
+    maintainer: "coolapso <coolapso@coolapso.tech>"
+    description: "The auto-pilot for tfimports"
+    license: "MIT"
+    formats:
+      - deb
+      - rpm
+
+archives:
+  - format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+announce:
+  discord:
+    enabled: true

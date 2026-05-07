@@ -1,0 +1,42 @@
+name: Go
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - "**"
+      - "!main"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: ">=1.21"
+
+      - name: Install dependencies
+        run: go get ./...
+
+      - name: Check formatting
+        run: |
+          changedFiles=$(go fmt ./...)
+          if [[ -n $changedFiles ]]; then
+            echo -e "Following files are not formatted:\n${changedFiles}"
+            exit 1
+          fi
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: latest
+          only-new-issues: true
+
+      - name: test build
+        run: go build -o autobs .
