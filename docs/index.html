@@ -186,6 +186,71 @@
                 </div>
             </div>
         </section>
+
+        <!-- Installation Section -->
+        <section id="installation" class="py-20 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 transition-colors duration-200">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold mb-10 text-center dark:text-white">Installation</h2>
+                
+                <div class="border-b border-gray-200 dark:border-gray-700 mb-6">
+                    <nav class="-mb-px flex space-x-8 overflow-x-auto" aria-label="Tabs" id="install-tabs">
+                        <button class="install-tab-btn border-indigo-500 text-indigo-600 dark:text-indigo-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-target="tab-script">macOS / Linux</button>
+                        <button class="install-tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-target="tab-windows">Windows</button>
+                        <button class="install-tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-target="tab-arch">Arch Linux</button>
+                        <button class="install-tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-target="tab-debian">Debian</button>
+                        <button class="install-tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-target="tab-rpm">RPM</button>
+                        <button class="install-tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-target="tab-go">Go</button>
+                    </nav>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-700 p-8 rounded-2xl border border-gray-100 dark:border-gray-600 transition-colors duration-200">
+                    
+                    <!-- Script Install -->
+                    <div id="tab-script" class="install-tab-content block">
+                        <h3 class="text-xl font-bold mb-4 dark:text-white">macOS / Linux (Install Script)</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Automatically detects OS/arch and installs to <code class="bg-gray-200 dark:bg-gray-600 px-1 py-0.5 rounded text-sm">/usr/local/bin</code>.</p>
+                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto whitespace-pre">curl -sL https://raw.githubusercontent.com/coolapso/tfimport/main/docs/install.sh | sudo bash</div>
+                    </div>
+
+                    <!-- Windows -->
+                    <div id="tab-windows" class="install-tab-content hidden">
+                        <h3 class="text-xl font-bold mb-4 dark:text-white">Windows</h3>
+                        <p class="text-gray-600 dark:text-gray-300">Download the latest Windows <code class="bg-gray-200 dark:bg-gray-600 px-1 py-0.5 rounded text-sm">.zip</code> archive from the <a href="https://github.com/coolapso/tfimport/releases" class="text-indigo-600 dark:text-indigo-400 hover:underline">Releases page</a>. Extract the <code class="bg-gray-200 dark:bg-gray-600 px-1 py-0.5 rounded text-sm">tfimport.exe</code> binary and add it to a folder in your <code class="bg-gray-200 dark:bg-gray-600 px-1 py-0.5 rounded text-sm">PATH</code>.</p>
+                    </div>
+
+                    <!-- Arch Linux -->
+                    <div id="tab-arch" class="install-tab-content hidden">
+                        <h3 class="text-xl font-bold mb-4 dark:text-white">Arch Linux (AUR)</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Available in the Arch User Repository.</p>
+                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto whitespace-pre">yay -S tfimport-bin</div>
+                    </div>
+
+                    <!-- Debian/Ubuntu -->
+                    <div id="tab-debian" class="install-tab-content hidden">
+                        <h3 class="text-xl font-bold mb-4 dark:text-white">Debian / Ubuntu</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Download the latest <code class="bg-gray-200 dark:bg-gray-600 px-1 py-0.5 rounded text-sm">.deb</code> release.</p>
+                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto whitespace-pre">wget https://github.com/coolapso/tfimport/releases/latest/download/tfimport_&lt;version&gt;_linux_amd64.deb
+sudo dpkg -i tfimport_&lt;version&gt;_linux_amd64.deb</div>
+                    </div>
+
+                    <!-- RPM (RHEL/Fedora) -->
+                    <div id="tab-rpm" class="install-tab-content hidden">
+                        <h3 class="text-xl font-bold mb-4 dark:text-white">RHEL / Fedora / CentOS</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Download the latest <code class="bg-gray-200 dark:bg-gray-600 px-1 py-0.5 rounded text-sm">.rpm</code> release.</p>
+                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto whitespace-pre">wget https://github.com/coolapso/tfimport/releases/latest/download/tfimport_&lt;version&gt;_linux_amd64.rpm
+sudo rpm -i tfimport_&lt;version&gt;_linux_amd64.rpm</div>
+                    </div>
+
+                    <!-- Go Install -->
+                    <div id="tab-go" class="install-tab-content hidden">
+                        <h3 class="text-xl font-bold mb-4 dark:text-white">Go Install</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">If you have Go installed, you can build from source.</p>
+                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto whitespace-pre">go install github.com/coolapso/tfimport@latest</div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer
@@ -231,6 +296,51 @@
                     document.documentElement.classList.add('dark');
                     localStorage.setItem('color-theme', 'dark');
                 }
+            }
+        });
+
+        // Tabs logic and OS detection
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.install-tab-btn');
+            const contents = document.querySelectorAll('.install-tab-content');
+
+            function activateTab(targetId) {
+                contents.forEach(content => {
+                    content.classList.remove('block');
+                    content.classList.add('hidden');
+                });
+                tabs.forEach(tab => {
+                    tab.classList.remove('border-indigo-500', 'text-indigo-600', 'dark:text-indigo-400');
+                    tab.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300', 'dark:text-gray-400', 'dark:hover:text-gray-300');
+                });
+
+                const targetContent = document.getElementById(targetId);
+                if (targetContent) {
+                    targetContent.classList.remove('hidden');
+                    targetContent.classList.add('block');
+                }
+                
+                const activeTab = document.querySelector(`.install-tab-btn[data-target="${targetId}"]`);
+                if (activeTab) {
+                    activeTab.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300', 'dark:text-gray-400', 'dark:hover:text-gray-300');
+                    activeTab.classList.add('border-indigo-500', 'text-indigo-600', 'dark:text-indigo-400');
+                }
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    activateTab(tab.getAttribute('data-target'));
+                });
+            });
+
+            // OS detection
+            const userAgent = window.navigator.userAgent.toLowerCase();
+            if (userAgent.indexOf("win") !== -1) {
+                activateTab('tab-windows');
+            } else if (userAgent.indexOf("mac") !== -1) {
+                activateTab('tab-script');
+            } else if (userAgent.indexOf("linux") !== -1) {
+                activateTab('tab-script'); // Default to script on Linux
             }
         });
     </script>
