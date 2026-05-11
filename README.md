@@ -16,6 +16,51 @@ Instead of manually hunting down the correct `terraform import` string format fo
 - **SDK Lookups**: Uses cloud provider SDKs (like AWS SDK) to look up opaque IDs (like `vpc-xxxxx` or resolving `aws_iam_policy` ARNs from path prefixes) based on tags and attributes known at plan time.
 - **Resilient**: Gracefully skips newly created resources and handles rate limiting with built-in configurable delays.
 
+## 📦 Installation
+
+### Arch Linux (AUR)
+You can install `tfimport` from the Arch User Repository using your favorite AUR helper (e.g., `yay`, `paru`):
+```bash
+yay -S tfimport-bin
+```
+
+### Debian-based / Ubuntu
+Grab the latest `.deb` package from the [Releases](https://github.com/coolapso/tfimport/releases) page and install it:
+```bash
+# Example for amd64 architecture
+wget https://github.com/coolapso/tfimport/releases/latest/download/tfimport_<version>_linux_amd64.deb
+sudo dpkg -i tfimport_<version>_linux_amd64.deb
+```
+
+### RPM-based (RHEL, Fedora, CentOS)
+Grab the latest `.rpm` package from the [Releases](https://github.com/coolapso/tfimport/releases) page and install it:
+```bash
+# Example for amd64 architecture
+wget https://github.com/coolapso/tfimport/releases/latest/download/tfimport_<version>_linux_amd64.rpm
+sudo rpm -i tfimport_<version>_linux_amd64.rpm
+```
+
+### Go Install ( Linux / macOS / Windows )
+If you have Go installed on your system, you can build and install it directly:
+```bash
+# Install the latest version
+go install github.com/coolapso/tfimport@latest
+
+# Or install a specific version
+go install github.com/coolapso/tfimport@v0.0.1
+```
+
+### Windows
+Download the latest Windows `.zip` archive from the [Releases](https://github.com/coolapso/tfimport/releases) page. Extract the `tfimport.exe` binary and move it to a folder that is included in your system's `PATH`.
+Alternatively, you can build it from source using the `go install` method above.
+
+### Install Script (macOS / Linux)
+You can also use our convenient installation script that automatically detects your OS and architecture, and downloads the correct binary to `/usr/local/bin`:
+```bash
+curl -sL https://raw.githubusercontent.com/coolapso/tfimport/main/docs/install.sh | sudo bash
+```
+*(An uninstall script is also available at `docs/uninstall.sh`)*
+
 ## 🛠 Usage
 
 1. Write your Terraform/Terragrunt manifests to match the infrastructure that already exists in the cloud.
