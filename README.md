@@ -89,29 +89,9 @@ tfimport
 
 ---
 
-## ⚖️ Import Execution Tradeoffs
+## ⚖️ Import Execution
 
 By default, `tfimport` generates a static `import.tf` file containing HCL `import {}` blocks (available in Terraform 1.5+ and OpenTofu). You can opt out of this and run CLI imports sequentially by passing the `--run-import` flag.
-
-Here is a breakdown of which method to choose for your workflow:
-
-### 1. Generating `import.tf` blocks (Default)
-**How it works:** `tfimport` parses your plan, deduces the IDs, and writes them into an `import.tf` file. You then run `tofu apply` (or `terraform apply`) to execute the imports.
-* **Pros:**
-  * **Incredibly Fast:** No CLI cold-starts. Terraform initializes the cloud provider once and handles all imports concurrently.
-  * **No DNS Exhaustion:** Avoids overwhelming your local DNS resolver with rapid-fire requests.
-* **Cons:**
-  * **Reconciliation on Apply:** Terraform will import the resources *and* immediately attempt to apply your HCL configuration over them. If your code is missing tags that exist in AWS, Terraform will destroy those tags.
-  * **Solution:** Always run `tofu plan` first to review what changes will be applied alongside the imports!
-
-### 2. Direct CLI Imports (`--run-import`)
-**How it works:** `tfimport` loops over every resource and sequentially runs `tofu import <address> <id>`. 
-* **Pros:**
-  * **"State-Only" Safety:** It only pulls the existing resource into your state file. It makes zero modifications to the real world. You can run `tofu plan` afterwards to manually reconcile differences (e.g., "Oh, I need to add this tag to my code").
-* **Cons:**
-  * **Slower:** The tool has to cold-start Terraform and the provider plugin for every single resource.
-  * **DNS/Rate Limits:** Firing off dozens of sequential `import` commands can overwhelm your local DNS (`127.0.0.53`) or hit AWS STS rate limits.
-  * **Solution:** This mode uses a default `2s` delay between imports to protect your network stack.
 
 ### 💡 Resilience & Smart Imports
 - **Graceful New Resource Handling:** If `tfimport` attempts to import a resource and the cloud provider returns a "non-existent remote object" error, it intelligently assumes this is a genuinely new resource you want to create (not import). It will gracefully skip it and continue without penalizing you with error timeouts.
