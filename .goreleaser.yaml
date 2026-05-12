@@ -1,5 +1,9 @@
 builds:
   - binary: tfimport
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -X github.com/coolapso/convcommitlint/cmd.Version={{.Version}}
     goos:
       - linux
       - windows

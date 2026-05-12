@@ -39,6 +39,7 @@ type settings struct {
 }
 
 var (
+	version                 = "dev"
 	yellow                  = color.New(color.FgYellow)
 	execPlanMessage         = "Executing plan..."
 	execParseMessage        = "Parsing tfplan..."
@@ -51,8 +52,9 @@ var (
 
 	// rootCmd represents the base command when called without any subcommands
 	rootCmd = &cobra.Command{
-		Use:   "tfimport",
-		Short: "Auto pilot for importing resources into tfstate",
+		Use:     "tfimport",
+		Version: version,
+		Short:   "Auto pilot for importing resources into tfstate",
 		Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
 
