@@ -3,7 +3,7 @@ builds:
     env:
       - CGO_ENABLED=0
     ldflags:
-      - -X github.com/coolapso/convcommitlint/cmd.Version={{.Version}}
+      - -X github.com/coolapso/tfimport/cmd.Version={{.Version}}
     goos:
       - linux
       - windows
