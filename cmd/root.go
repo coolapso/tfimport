@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime/debug"
 	"slices"
 	"strings"
 	"time"
@@ -79,6 +80,13 @@ func Execute() {
 
 // init rootCmd flags
 func init() {
+	if Version == "dev" {
+		if info, ok := debug.ReadBuildInfo(); ok {
+			if info.Main.Version != "" && info.Main.Version != "(devel)" {
+				Version = info.Main.Version
+			}
+		}
+	}
 	rootCmd.Flags().Bool("tg", false, "executes plan and imports using terragrunt")
 	rootCmd.Flags().Bool("terraform", false, "executes plan and imports using Terraform")
 	rootCmd.Flags().Bool("dry-run", false, "Shows import details, only used with --run-import")
