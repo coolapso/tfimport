@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
+	"github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	tfjson "github.com/hashicorp/terraform-json"
 )
@@ -84,6 +85,8 @@ func resolveCustomextractAWSImportID(ctx *ProviderContext, resourceType string, 
 				}
 			}
 		}
+	case "aws_sqs_queue_policy", "aws_sqs_queue_redrive_allow_policy", "aws_sqs_queue_redrive_policy":
+		return resolveAttribute(ctx, config, "queue_url")
 	case "aws_sqs_queue":
 		if ctx != nil {
 			awsClient := ctx.GetAWSClient()
@@ -1721,11 +1724,54 @@ func resolveCustomextractAWSImportID(ctx *ProviderContext, resourceType string, 
 		}
 		return ""
 	case "aws_sns_topic_subscription":
-		name := resolveAttribute(ctx, config, "name")
-		if name != "" && ctx != nil {
+		topicArn := resolveAttribute(ctx, config, "topic_arn")
+		endpoint := resolveAttribute(ctx, config, "endpoint")
+		if topicArn != "" && endpoint != "" && ctx != nil {
 			awsClient := ctx.GetAWSClient()
-			if awsClient != nil && awsClient.AccountID != "" && awsClient.Region != "" {
-				return fmt.Sprintf("arn:%s:sns:%s:%s:%s", awsClient.Partition, awsClient.Region, awsClient.AccountID, name)
+			if awsClient != nil && awsClient.SNSClient != nil {
+				if !strings.HasPrefix(topicArn, "arn:") && awsClient.Partition != "" && awsClient.Region != "" && awsClient.AccountID != "" {
+					topicArn = fmt.Sprintf("arn:%s:sns:%s:%s:%s", awsClient.Partition, awsClient.Region, awsClient.AccountID, topicArn)
+				}
+
+				if strings.HasPrefix(endpoint, "https://sqs.") {
+					parts := strings.Split(endpoint, "/")
+					if len(parts) >= 5 {
+						regionParts := strings.Split(parts[2], ".")
+						if len(regionParts) >= 2 {
+							region := regionParts[1]
+							account := parts[3]
+							queueName := parts[4]
+							endpoint = fmt.Sprintf("arn:%s:sqs:%s:%s:%s", awsClient.Partition, region, account, queueName)
+						}
+					}
+				}
+
+				paginator := sns.NewListSubscriptionsByTopicPaginator(awsClient.SNSClient, &sns.ListSubscriptionsByTopicInput{
+					TopicArn: aws.String(topicArn),
+				})
+				for paginator.HasMorePages() {
+					page, err := paginator.NextPage(ctx.Context)
+					if err != nil {
+						break
+					}
+					for _, sub := range page.Subscriptions {
+						if sub.Endpoint != nil && sub.SubscriptionArn != nil && *sub.SubscriptionArn != "PendingConfirmation" {
+							if *sub.Endpoint == endpoint {
+								return *sub.SubscriptionArn
+							}
+
+							ep1 := *sub.Endpoint
+							ep2 := endpoint
+							if strings.Contains(ep1, "sqs") && strings.Contains(ep2, "sqs") {
+								parts1 := strings.Split(strings.ReplaceAll(ep1, "/", ":"), ":")
+								parts2 := strings.Split(strings.ReplaceAll(ep2, "/", ":"), ":")
+								if len(parts1) > 0 && len(parts2) > 0 && parts1[len(parts1)-1] == parts2[len(parts2)-1] {
+									return *sub.SubscriptionArn
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 		return ""

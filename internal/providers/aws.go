@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
+	"github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
@@ -20,6 +21,7 @@ type AWSClientContext struct {
 	Partition string
 	EC2Client *ec2.Client
 	IAMClient *iam.Client
+	SNSClient *sns.Client
 	SQSClient *sqs.Client
 }
 
@@ -37,6 +39,7 @@ func (p *ProviderContext) GetAWSClient() *AWSClientContext {
 			Partition: "aws", // Default fallback
 			EC2Client: ec2.NewFromConfig(awsCfg),
 			IAMClient: iam.NewFromConfig(awsCfg),
+			SNSClient: sns.NewFromConfig(awsCfg),
 			SQSClient: sqs.NewFromConfig(awsCfg),
 		}
 
@@ -5633,14 +5636,10 @@ func extractAWSImportID(ctx *ProviderContext, resourceType string, config map[st
 			return val
 		}
 		return ""
-	case "aws_sqs_queue_policy":
-		// Unknown ID format: the queue URL
-		return ""
-	case "aws_sqs_queue_redrive_allow_policy":
-		// Unknown ID format: the queue URL
-		return ""
-	case "aws_sqs_queue_redrive_policy":
-		// Unknown ID format: the queue URL
+	case "aws_sqs_queue_policy", "aws_sqs_queue_redrive_allow_policy", "aws_sqs_queue_redrive_policy":
+		if id := resolveCustomextractAWSImportID(ctx, "aws_sqs_queue_policy", config); id != "" {
+			return id
+		}
 		return ""
 	case "aws_ssm_activation":
 		// Computed or complex ID format: the `id`
