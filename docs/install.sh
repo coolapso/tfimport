@@ -39,7 +39,7 @@ if [ -z "$LATEST" ]; then
 fi
 
 VERSION_NO_V="${LATEST#v}"
-FILENAME="AutoBS_${VERSION_NO_V}_${OS}_${ARCH}.${EXT}"
+FILENAME="${BINARY_NAME}_${VERSION_NO_V}_${OS}_${ARCH}.${EXT}"
 DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${LATEST}/${FILENAME}"
 
 TMP_DIR=$(mktemp -d)
