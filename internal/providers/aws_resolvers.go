@@ -87,6 +87,36 @@ func resolveCustomextractAWSImportID(ctx *ProviderContext, resourceType string, 
 		}
 	case "aws_sqs_queue_policy", "aws_sqs_queue_redrive_allow_policy", "aws_sqs_queue_redrive_policy":
 		return resolveAttribute(ctx, config, "queue_url")
+	case "aws_s3_bucket_ownership_controls",
+		"aws_s3_bucket_public_access_block",
+		"aws_s3_bucket_policy",
+		"aws_s3_bucket_notification",
+		"aws_s3_bucket_replication_configuration",
+		"aws_s3_bucket_lifecycle_configuration":
+		// Imported using the bucket name only.
+		return resolveAttribute(ctx, config, "bucket")
+	case "aws_s3_bucket_server_side_encryption_configuration",
+		"aws_s3_bucket_versioning",
+		"aws_s3_bucket_accelerate_configuration",
+		"aws_s3_bucket_cors_configuration",
+		"aws_s3_bucket_logging",
+		"aws_s3_bucket_object_lock_configuration",
+		"aws_s3_bucket_request_payment_configuration",
+		"aws_s3_bucket_website_configuration":
+		// Imported using the bucket name, or `bucket,expected_bucket_owner`
+		// when the bucket is owned by a different account.
+		return resolveS3BucketSubResourceID(ctx, config)
+	case "aws_s3_bucket_acl":
+		// Imported using `bucket`, `bucket,expected_bucket_owner`, `bucket,acl`
+		// or `bucket,expected_bucket_owner,acl`.
+		id := resolveS3BucketSubResourceID(ctx, config)
+		if id == "" {
+			return ""
+		}
+		if acl, ok := config["acl"].(string); ok && acl != "" {
+			return fmt.Sprintf("%s,%s", id, acl)
+		}
+		return id
 	case "aws_sqs_queue":
 		if ctx != nil {
 			awsClient := ctx.GetAWSClient()
@@ -2018,6 +2048,9 @@ func resolveAttribute(ctx *ProviderContext, config map[string]any, attr string) 
 				// Default to standard GetImportID hydration logic which usually returns ARN/ID/Name
 				expectedAttr = ""
 			}
+			// References may carry an index (e.g. aws_s3_bucket.this[0].id); strip it so it
+			// can be matched against the base address of the resource changes below.
+			refAddress = re.ReplaceAllString(refAddress, "")
 
 			// We only support resolving attributes from other resources created in same plan
 			for _, rc := range ctx.Plan.ResourceChanges {
@@ -2146,4 +2179,21 @@ func lookupSqsQueueUrl(ctx *ProviderContext, config map[string]any) string {
 	}
 
 	return ""
+}
+
+// resolveS3BucketSubResourceID builds the import ID for S3 bucket sub-resources
+// (versioning, server side encryption, ...) which import using the bucket name,
+// optionally suffixed with `,expected_bucket_owner` when the bucket is owned by
+// another account. The bucket attribute is usually a reference to an
+// aws_s3_bucket created in the same plan and therefore computed, so it is
+// hydrated through resolveAttribute.
+func resolveS3BucketSubResourceID(ctx *ProviderContext, config map[string]any) string {
+	bucket := resolveAttribute(ctx, config, "bucket")
+	if bucket == "" {
+		return ""
+	}
+	if owner, ok := config["expected_bucket_owner"].(string); ok && owner != "" {
+		return fmt.Sprintf("%s,%s", bucket, owner)
+	}
+	return bucket
 }
